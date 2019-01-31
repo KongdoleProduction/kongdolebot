@@ -1,0 +1,22 @@
+{
+  "name": "kongdolebot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KongdoleProduction/kongdolebot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KongdoleProduction/kongdolebot/issues"
+  },
+  "homepage": "https://github.com/KongdoleProduction/kongdolebot#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}

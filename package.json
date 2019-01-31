@@ -1,0 +1,16 @@
+{
+  "name": "kongdolebot",
+  "version": "0.0.0",
+  "private": true,
+
+  "author": "Ray Suhyun Lee <raysuhyunlee@gmail.com>",
+
+  "description": "A simple helpful robot for your Company",
+
+  "dependencies": {
+  },
+
+  "engines": {
+    "node": "0.10.x"
+  }
+}

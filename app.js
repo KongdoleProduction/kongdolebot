@@ -22,8 +22,20 @@ app.post('/', function(req, res) {
       if (payload.event.type === "app_mention") {
         console.log(payload.event.text);
 
+        var text = "Knock knock";
+        if (payload.event.text.includes('팩트')) {
+
+          let facts = [
+            "감자는 치킨을 좋아한다",
+            "지니는 나라를 지킨다",
+            "사장님은 잘생겼다",
+          ];
+
+          text = facts[Math.floor(Math.random() * facts.length)];
+        }
+
         let payload_reply = {
-          'text': 'Knock, knock.',
+          'text': text,
           'channel': payload.event.channel };
 
         request.post(

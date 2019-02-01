@@ -18,7 +18,8 @@
   },
   "homepage": "https://github.com/KongdoleProduction/kongdolebot#readme",
   "dependencies": {
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "request": "2.88.0"
   },
   "engines": {
     "node": "9.4.0",

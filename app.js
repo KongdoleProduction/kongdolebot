@@ -23,13 +23,15 @@ app.post('/', function(req, res) {
         console.log(payload.event.text);
 
         let payload_reply = {
-          'token': BOT_TOKEN,
           'text': 'Knock, knock.',
           'channel': payload.event.channel };
 
         request.post(
             { 
-              headers: { 'content-type' : 'application/json' },
+              headers: {
+                'content-type' : 'application/json; charset=utf-8',
+                'Authorization': 'Bearer ' + BOT_TOKEN
+              },
               url: "https://slack.com/api/chat.postMessage",
               body: JSON.stringify(payload_reply),
             },

@@ -8,6 +8,14 @@ var server = app.listen(PORT, function() {
 
 app.post('/', function(req, res) {
     console.log(req.body);
-    var body = req.body;
-    res.send(body.challenge);
+    let payload = req.body;
+    res.sendStatus(200);
+
+    if (payload.type === "url_verification") {
+      res.send(body.challenge);
+    } else if (payload.type === "event_callback") {
+      if (payload.event.type === "app_mention") {
+        console.log(payload.event.text);
+      }
+    }
 })

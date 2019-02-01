@@ -7,13 +7,13 @@ var server = app.listen(PORT, function() {
 })
 
 app.post('/', function(req, res) {
-    console.log(req.body);
+    console.log("REQUEST> " + req.body);
     let payload = req.body;
-    res.sendStatus(200);
 
     if (payload.type === "url_verification") {
-      res.send(body.challenge);
+      res.send(payload.challenge);
     } else if (payload.type === "event_callback") {
+      res.sendStatus(200);
       if (payload.event.type === "app_mention") {
         console.log(payload.event.text);
       }

@@ -140,26 +140,13 @@ var getUsers = function() {
       },
       function (error, response, body) {
         if (error) {
-          console.error('get users failed: ', error);
-          return null;
+          return console.error('get users failed: ', error);
         }
 
         console.log('got users');
 
         let payload = body.members;
         users = payload;
-        /* TODO: delete these lines 
-        for (var i in payload) {
-          var u = payload[i];
-          users[u.id] = {
-            'name': u.name,
-            'real_name' : u.real_name,
-            'display_name' : u.profile.display_name
-          };
-        } */
-        
-        //console.log(users);
-        return users;
       }
   );
 }
@@ -174,16 +161,14 @@ var getDMChannels = function () {
       },
       function (error, response, body) {
         if (error) {
-          console.error('get users failed: ', error);
-          return null;
+          return console.error('get users failed: ', error);
         }
         
         console.log('got dm channels');
         body = JSON.parse(body);
 
-        let channels = body.channels;
-        console.log(channels);
-        return channels;
+        dm_channels = body.channels;
+        //console.log(channels);
       }
   );
 }

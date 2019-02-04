@@ -51,10 +51,10 @@ app.post('/', function(req, res) {
 
         let user_id = payload.event.user;
         if (!user_id) { 
-          /* this message is sent by a bot */
+          /* this message is from a bot */
           return;
         } else if (channel === ADMIN_CHANNEL) {
-          /* this message is sent by administrator */
+          /* this message is from administrator */
           let re = /\s*\[\[([\s\S]+)\]\]\s*([\s\S]+)/;
 
           let arr = re.exec(text);
@@ -67,6 +67,7 @@ app.post('/', function(req, res) {
           let target_msg = arr[2];
           let target_user = users.find(function(element) {
             return (element.profile.display_name === target_user_name)
+              || (element.profile.real_name === target_user_name)
               || (element.name === target_user_name)
               || (element.real_name === target_user_name);
           });
@@ -82,10 +83,10 @@ app.post('/', function(req, res) {
             });
 
             sendReply(target_msg, target_channel.id);
-            sendReply("전송 완료!", ADMIN_CHANNEL);
+            sendReply(target_user_name + "님에게 메시지 전송 완료!", ADMIN_CHANNEL);
           }
         } else {
-          /* this message is sent by a normal user */
+          /* this message is from a normal user */
           user = users.find(function(element) {
             return element.id === user_id; });
           let username = user.profile.display_name;

@@ -3,9 +3,11 @@ var request = require('request');
 var app = express();
 app.use(express.json());
 
-const PORT = process.env.PORT
-const BOT_TOKEN = process.env.BOT_TOKEN
-const ADMIN = process.env.BOT_ADMIN
+const PORT = process.env.PORT;
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const BOT_ID = process.env.BOT_ID; // maybe useful in the future to prevent reply-to-itself
+const ADMIN = process.env.BOT_ADMIN;
+const ADMIN_CHANNEL = process.env.BOT_ADMIN_CHANNEL;
 
 var server = app.listen(PORT, function() {
   console.log("Server started on port " + PORT);
@@ -36,13 +38,17 @@ app.post('/', function(req, res) {
 
         sendReply(text, payload.event.channel); 
       } else if (payload.event.type === 'message') {
+          let text = payload.event.text;
+          let user = payload.event.user;
+          if (user) {
+            let username = payload.event.username;
+          }
+          let channel_type = payload.event.channel_type;
+          console.log("message(" + channel_type + "): ", text); 
         if (payload.event.channel_type === 'im') {
-          text = payload.event.text
-          user = payload.event.user;
-          console.log("message(im): ", text);
+          let msg = '[' + username + '] ' + text;
+          sendReply(msg, ADMIN_CHANNEL);
         } else if (payload.event.channel_type === 'channel') {
-          text = payload.event.text
-          console.log('message(channel): ', text);
         }
       }
     }

@@ -53,6 +53,12 @@ app.post('/', function(req, res) {
               console.log(body); 
             }
         ); 
+      } else if (payload.event.type === 'message.im') {
+        console.log("message.im");
+        console.log(payload.event.text);
+      } else if (payload.event.type === 'message.channels') {
+        console.log("message.channels");
+        console.log(payload.event.text);
       }
     }
 })

@@ -10,12 +10,15 @@ const ADMIN = process.env.BOT_ADMIN;
 const ADMIN_CHANNEL = process.env.BOT_ADMIN_CHANNEL;
 
 var users = [];
+var dm_channels = [];
 
 var server = app.listen(PORT, function() {
   console.log("Server started on port " + PORT);
 
   users = getUsers();
-})
+  dm_channels = getDMChannels();
+  console.log(dm_channels);
+});
 
 app.post('/', function(req, res) {
     console.log('received: ', req.body);
@@ -67,7 +70,6 @@ app.post('/', function(req, res) {
             return (element.profile.display_name === target_user_name)
               || (element.name === target_user_name)
               || (element.real_name === target_user_name);
-
           });
           if (!target_user) {
             let msg = "존재하지 않는 사용자입니다.\n사용법: [[사용자 이름]] 메시지";
@@ -76,7 +78,13 @@ app.post('/', function(req, res) {
             let msg = "보낼 메시지를 입력해주세요.\n사용법: [[사용자 이름]] 보낼 메시지";
             sendReply(msg, ADMIN_CHANNEL);
           } else {
-            //sendReply(msg, ); //TODO
+            let target_channel = dm_channels.find(function(element) {
+              return element.user === target_user.id;
+            });
+            console.log("target_user id: ", target_user.id);
+            console.log("channel: ", dm_channels);
+
+            sendReply(target_msg, target_channel);
             sendReply("전송 완료!", ADMIN_CHANNEL);
           }
         } else {
@@ -95,7 +103,7 @@ app.post('/', function(req, res) {
         }
       }
     }
-})
+});
 
 var sendReply = function(message, channel) {
   let payload_reply = {
@@ -136,7 +144,7 @@ var getUsers = function() {
           return null;
         }
 
-        console.log('got users: ');
+        console.log('got users');
 
         let payload = body.members;
         users = payload;
@@ -150,8 +158,32 @@ var getUsers = function() {
           };
         } */
         
-        console.log(users);
+        //console.log(users);
         return users;
+      }
+  );
+}
+
+var getDMChannels = function () {
+  request.get(
+      {
+        headers: {
+          'content-type' : 'application/x-www-form-urlencoded; charset=utf-8',
+          'Authorization': 'Bearer ' + BOT_TOKEN },
+        url: 'https://slack.com/api/conversations.list?types=im',
+      },
+      function (error, response, body) {
+        if (error) {
+          console.error('get users failed: ', error);
+          return null;
+        }
+        
+        console.log('got dm channels');
+        body = JSON.parse(body);
+
+        let channels = body.channels;
+        console.log(channels);
+        return channels;
       }
   );
 }

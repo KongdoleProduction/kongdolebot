@@ -84,6 +84,9 @@ app.post('/', function(req, res) {
           user = users.find(function(element) {
             return element.id === user_id; });
           let username = user.profile.display_name;
+          if (!username || username.length == 0) {
+            username = user.profile.real_name;
+          }
           if (payload.event.channel_type === 'im') {
             let msg = '[' + username + '] ' + text;
             sendReply(msg, ADMIN_CHANNEL);

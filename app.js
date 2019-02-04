@@ -17,7 +17,6 @@ var server = app.listen(PORT, function() {
 
   users = getUsers();
   dm_channels = getDMChannels();
-  console.log(dm_channels);
 });
 
 app.post('/', function(req, res) {
@@ -81,10 +80,8 @@ app.post('/', function(req, res) {
             let target_channel = dm_channels.find(function(element) {
               return element.user === target_user.id;
             });
-            console.log("target_user id: ", target_user.id);
-            console.log("channel: ", dm_channels);
 
-            sendReply(target_msg, target_channel);
+            sendReply(target_msg, target_channel.id);
             sendReply("전송 완료!", ADMIN_CHANNEL);
           }
         } else {
@@ -145,8 +142,7 @@ var getUsers = function() {
 
         console.log('got users');
 
-        let payload = body.members;
-        users = payload;
+        users = body.members;
       }
   );
 }
@@ -165,10 +161,9 @@ var getDMChannels = function () {
         }
         
         console.log('got dm channels');
-        body = JSON.parse(body);
+        body = JSON.parse(body); // this is required since GET request returns with raw string
 
         dm_channels = body.channels;
-        //console.log(channels);
       }
   );
 }

@@ -42,15 +42,22 @@ app.post('/', function(req, res) {
 
         sendReply(text, payload.event.channel); 
       } else if (payload.event.type === 'message') {
-          let text = payload.event.text;
-          let user = payload.event.user;
+        let text = payload.event.text;
+        let channel_type = payload.event.channel_type;
+        console.log("message(" + channel_type + "): ", text); 
+
+        let user = payload.event.user;
+        if (!user) { 
+          /* this message is sent by a bot */
+          return;
+        } else {
+          /* this message is sent by a user */
           let username = users[user].name;
-          let channel_type = payload.event.channel_type;
-          console.log("message(" + channel_type + "): ", text); 
-        if (payload.event.channel_type === 'im') {
-          let msg = '[' + username + '] ' + text;
-          sendReply(msg, ADMIN_CHANNEL);
-        } else if (payload.event.channel_type === 'channel') {
+          if (payload.event.channel_type === 'im') {
+            let msg = '[' + username + '] ' + text;
+            sendReply(msg, ADMIN_CHANNEL);
+          } else if (payload.event.channel_type === 'channel') {
+          }
         }
       }
     }
@@ -94,12 +101,20 @@ var getUsers = function() {
           console.error('get users failed: ', error);
           return null;
         }
-        console.log('got users: ', body);
+
+        console.log('got users: ');
+
         let payload = body.members;
         users = {};
-        for (var u in payload) {
-          users[u.id] = { 'name': u.name };
+        for (var i in payload) {
+          var u = payload[i];
+          users[u.id] = {
+            'name': u.name,
+            'real_name' : u.real_name
+          };
         }
+        
+        console.log(users);
         return users;
       }
   );

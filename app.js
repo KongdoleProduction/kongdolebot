@@ -5,14 +5,14 @@ app.use(express.json());
 
 const PORT = process.env.PORT
 const BOT_TOKEN = process.env.BOT_TOKEN
+const ADMIN = process.env.BOT_ADMIN
 
 var server = app.listen(PORT, function() {
   console.log("Server started on port " + PORT);
 })
 
 app.post('/', function(req, res) {
-    console.log("REQUEST> ");
-    console.log(req.body);
+    console.log('received: ', req.body);
     let payload = req.body;
 
     if (payload.type === "url_verification") {
@@ -34,31 +34,39 @@ app.post('/', function(req, res) {
           text = facts[Math.floor(Math.random() * facts.length)];
         }
 
-        let payload_reply = {
-          'text': text,
-          'channel': payload.event.channel };
-
-        request.post(
-            { 
-              headers: {
-                'content-type' : 'application/json; charset=utf-8',
-                'Authorization': 'Bearer ' + BOT_TOKEN
-              },
-              url: "https://slack.com/api/chat.postMessage",
-              body: JSON.stringify(payload_reply),
-            },
-            function (error, response, body) {
-              console.log("POST request sent> ")
-              console.log(error);
-              console.log(body); 
-            }
-        ); 
-      } else if (payload.event.type === 'message.im') {
-        console.log("message.im");
-        console.log(payload.event.text);
-      } else if (payload.event.type === 'message.channels') {
-        console.log("message.channels");
-        console.log(payload.event.text);
+        sendReply(text, payload.event.channel); 
+      } else if (payload.event.type === 'event_callback') {
+        if (payload.event.channel_type === 'im') {
+          text = payload.event.text
+          user = payload.event.user;
+          console.log("message(im): ", text);
+        } else if (payload.event.channel_type === 'channel') {
+          text = payload.event.text
+          console.log('message(channel): ', text);
+        }
       }
     }
 })
+
+var sendReply = function(message, channel) {
+  let payload_reply = {
+    'text': text,
+    'channel': payload.event.channel };
+
+  request.post(
+      { 
+        headers: {
+          'content-type' : 'application/json; charset=utf-8',
+          'Authorization': 'Bearer ' + BOT_TOKEN },
+        url: "https://slack.com/api/chat.postMessage",
+        body: payload_reply,
+        json: true
+      },
+      function (error, response, body) {
+        if (error) {
+          return console.error('reply failed: ', error)
+        }
+        console.log("reply sent: ", body)
+      }
+  ); 
+}

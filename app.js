@@ -9,8 +9,12 @@ const BOT_ID = process.env.BOT_ID; // maybe useful in the future to prevent repl
 const ADMIN = process.env.BOT_ADMIN;
 const ADMIN_CHANNEL = process.env.BOT_ADMIN_CHANNEL;
 
+var users = {};
+
 var server = app.listen(PORT, function() {
   console.log("Server started on port " + PORT);
+
+  users = getUsers();
 })
 
 app.post('/', function(req, res) {
@@ -40,9 +44,7 @@ app.post('/', function(req, res) {
       } else if (payload.event.type === 'message') {
           let text = payload.event.text;
           let user = payload.event.user;
-          if (user) {
-            let username = payload.event.username;
-          }
+          let username = users[user].name;
           let channel_type = payload.event.channel_type;
           console.log("message(" + channel_type + "): ", text); 
         if (payload.event.channel_type === 'im') {
@@ -70,9 +72,35 @@ var sendReply = function(message, channel) {
       },
       function (error, response, body) {
         if (error) {
-          return console.error('reply failed: ', error)
+          return console.error('reply failed: ', error);
         }
-        console.log("reply sent: ", body)
+        console.log("reply sent: ", body);
       }
   ); 
+}
+
+var getUsers = function() {
+  request.post(
+      {
+        headers: {
+          'content-type' : 'application/json; charset=utf-8',
+          'Authorization': 'Bearer ' + BOT_TOKEN },
+        url: 'https://slack.com/api/users.list',
+        body: {},
+        json: true
+      },
+      function (error, response, body) {
+        if (error) {
+          console.error('get users failed: ', error);
+          return null;
+        }
+        console.log('got users: ', body);
+        let payload = body.members;
+        users = {};
+        for (var u in payload) {
+          users[u.id] = { 'name': u.name };
+        }
+        return users;
+      }
+  );
 }

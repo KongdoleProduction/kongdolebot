@@ -9,7 +9,7 @@ const BOT_ID = process.env.BOT_ID; // maybe useful in the future to prevent repl
 const ADMIN = process.env.BOT_ADMIN;
 const ADMIN_CHANNEL = process.env.BOT_ADMIN_CHANNEL;
 
-var users = {};
+var users = [];
 
 var server = app.listen(PORT, function() {
   console.log("Server started on port " + PORT);
@@ -46,13 +46,15 @@ app.post('/', function(req, res) {
         let channel_type = payload.event.channel_type;
         console.log("message(" + channel_type + "): ", text); 
 
-        let user = payload.event.user;
-        if (!user) { 
+        let user_id = payload.event.user;
+        if (!user_id) { 
           /* this message is sent by a bot */
           return;
         } else {
           /* this message is sent by a user */
-          let username = users[user].name;
+          user = users.find(function(element) {
+            return element.id === user_id; });
+          let username = user.profile.display_name;
           if (payload.event.channel_type === 'im') {
             let msg = '[' + username + '] ' + text;
             sendReply(msg, ADMIN_CHANNEL);
@@ -105,14 +107,16 @@ var getUsers = function() {
         console.log('got users: ');
 
         let payload = body.members;
-        users = {};
+        users = payload;
+        /* TODO: delete these lines 
         for (var i in payload) {
           var u = payload[i];
           users[u.id] = {
             'name': u.name,
-            'real_name' : u.real_name
+            'real_name' : u.real_name,
+            'display_name' : u.profile.display_name
           };
-        }
+        } */
         
         console.log(users);
         return users;

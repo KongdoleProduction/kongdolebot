@@ -50,8 +50,8 @@ app.post('/', function(req, res) {
 
 var sendReply = function(message, channel) {
   let payload_reply = {
-    'text': text,
-    'channel': payload.event.channel };
+    'text': message,
+    'channel': channel };
 
   request.post(
       { 

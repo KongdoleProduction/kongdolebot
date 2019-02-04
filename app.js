@@ -35,7 +35,7 @@ app.post('/', function(req, res) {
         }
 
         sendReply(text, payload.event.channel); 
-      } else if (payload.event.type === 'event_callback') {
+      } else if (payload.event.type === 'message') {
         if (payload.event.channel_type === 'im') {
           text = payload.event.text
           user = payload.event.user;

@@ -44,14 +44,43 @@ app.post('/', function(req, res) {
       } else if (payload.event.type === 'message') {
         let text = payload.event.text;
         let channel_type = payload.event.channel_type;
+        let channel = payload.event.channel;
         console.log("message(" + channel_type + "): ", text); 
 
         let user_id = payload.event.user;
         if (!user_id) { 
           /* this message is sent by a bot */
           return;
+        } else if (channel === ADMIN_CHANNEL) {
+          /* this message is sent by administrator */
+          let re = /\s*\[\[([\s\S]+)\]\]\s*([\s\S]+)/;
+
+          let arr = re.exec(text);
+          if (!arr) {
+            let msg = "사용법: [[사용자 이름]] 메시지";
+            sendReply(msg, ADMIN_CHANNEL);
+            return;
+          }
+          let target_user_name = arr[1];
+          let target_msg = arr[2];
+          let target_user = users.find(function(element) {
+            return (element.profile.display_name === target_user_name)
+              || (element.name === target_user_name)
+              || (element.real_name === target_user_name);
+
+          });
+          if (!target_user) {
+            let msg = "존재하지 않는 사용자입니다.\n사용법: [[사용자 이름]] 메시지";
+            sendReply(msg, ADMIN_CHANNEL);
+          } else if (!target_msg || target_msg.length == 0) {
+            let msg = "보낼 메시지를 입력해주세요.\n사용법: [[사용자 이름]] 보낼 메시지";
+            sendReply(msg, ADMIN_CHANNEL);
+          } else {
+            //sendReply(msg, ); //TODO
+            sendReply("전송 완료!", ADMIN_CHANNEL);
+          }
         } else {
-          /* this message is sent by a user */
+          /* this message is sent by a normal user */
           user = users.find(function(element) {
             return element.id === user_id; });
           let username = user.profile.display_name;

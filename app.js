@@ -65,25 +65,36 @@ app.post('/', function(req, res) {
           }
           let target_user_name = arr[1];
           let target_msg = arr[2];
-          let target_user = users.find(function(element) {
-            return (element.profile.display_name === target_user_name)
-              || (element.profile.real_name === target_user_name)
-              || (element.name === target_user_name)
-              || (element.real_name === target_user_name);
-          });
-          if (!target_user) {
-            let msg = "존재하지 않는 사용자입니다.\n사용법: [[사용자 이름]] 메시지";
-            sendReply(msg, ADMIN_CHANNEL);
-          } else if (!target_msg || target_msg.length == 0) {
-            let msg = "보낼 메시지를 입력해주세요.\n사용법: [[사용자 이름]] 보낼 메시지";
-            sendReply(msg, ADMIN_CHANNEL);
+          if (target_user_name == '전체') {
+            let human_users = users.filter(x => !x.is_bot && !(x.id === 'USLACKBOT'));
+            let target_users_id = human_users.map(x => x.id);
+            for (i in target_users_id) {
+              let tuid = target_users_id[i];
+              let target_channel = dm_channels.find(x => x.user === tuid);
+              sendReply(target_msg, target_channel.id);
+            }
+            sendReply("전체 메시지 전송 완료!", ADMIN_CHANNEL);
           } else {
-            let target_channel = dm_channels.find(function(element) {
-              return element.user === target_user.id;
+            let target_user = users.find(function(element) {
+              return (element.profile.display_name === target_user_name)
+                || (element.profile.real_name === target_user_name)
+                || (element.name === target_user_name)
+                || (element.real_name === target_user_name);
             });
+            if (!target_user) {
+              let msg = "존재하지 않는 사용자입니다.\n사용법: [[사용자 이름]] 메시지";
+              sendReply(msg, ADMIN_CHANNEL);
+            } else if (!target_msg || target_msg.length == 0) {
+              let msg = "보낼 메시지를 입력해주세요.\n사용법: [[사용자 이름]] 보낼 메시지";
+              sendReply(msg, ADMIN_CHANNEL);
+            } else {
+              let target_channel = dm_channels.find(function(element) {
+                return element.user === target_user.id;
+              });
 
-            sendReply(target_msg, target_channel.id);
-            sendReply(target_user_name + "님에게 메시지 전송 완료!", ADMIN_CHANNEL);
+              sendReply(target_msg, target_channel.id);
+              sendReply(target_user_name + "님에게 메시지 전송 완료!", ADMIN_CHANNEL);
+            }
           }
         } else {
           /* this message is from a normal user */

@@ -19,6 +19,8 @@
   "homepage": "https://github.com/KongdoleProduction/kongdolebot#readme",
   "dependencies": {
     "express": "^4.16.4",
+    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.23",
     "request": "2.88.0"
   },
   "engines": {

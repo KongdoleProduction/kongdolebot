@@ -1,5 +1,6 @@
 var express = require('express');
 var request = require('request');
+var moment = require('moment-timezone');
 var app = express();
 app.use(express.json());
 
@@ -76,16 +77,30 @@ app.post('/', function(req, res) {
             let arr_msg = re_msg.exec(cmd_contents);
             let target_msg = arr_msg[1];
 
-            let human_users = users.filter(x => !x.is_bot && !(x.id === 'USLACKBOT'));
-            let target_users_id = human_users.map(x => x.id);
-            for (i in target_users_id) {
-              let tuid = target_users_id[i];
-              let target_channel = dm_channels.find(x => x.user === tuid);
-              sendReply(target_msg, target_channel.id);
-            }
+            sendAll(target_msg);
             sendReply("전체 메시지 전송 완료!", ADMIN_CHANNEL);
           } else if (cmd_name == '예약') {
+            let re_reserve = /\s*(\d\d)\:(\d\d)\s+([\s\S]+)/;
+            let arr_reserve = re_reserve.exec(cmd_contents);
+            let hour_str = arr_reserve[1];
+            let min_str = arr_reserve[2];
+            let target_msg = arr_reserve[3];
 
+            /* calculate time left to trigger */
+            let date_now = moment();
+            let date_target = moment().tz("Asia/Seoul");
+            date_target.hours(parseInt(hour_str));
+            date_target.minutes(parseInt(min_str));
+            date_target.seconds(0);
+            if (date_target < date_now)
+              date_target.add(1, 'days');
+            let timeout = date_target - date_now; 
+
+            /* reserve a broadcast message */
+            setTimeout(() => {
+              sendAll(target_msg);
+            }, timeout);
+            sendReply(`${hour_str}:${min_str}에 예약 완료!`, ADMIN_CHANNEL);
           }
           
          // } else { /* send to individual */
@@ -193,4 +208,14 @@ var getDMChannels = function () {
         dm_channels = body.channels;
       }
   );
+}
+
+var sendAll = function(target_msg) {
+  let human_users = users.filter(x => !x.is_bot && !(x.id === 'USLACKBOT'));
+  let target_users_id = human_users.map(x => x.id);
+  for (i in target_users_id) {
+    let tuid = target_users_id[i];
+    let target_channel = dm_channels.find(x => x.user === tuid);
+    sendReply(target_msg, target_channel.id);
+  }
 }

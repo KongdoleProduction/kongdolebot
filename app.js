@@ -65,7 +65,7 @@ app.post('/', function(req, res) {
           }
           let target_user_name = arr[1];
           let target_msg = arr[2];
-          if (target_user_name == '전체') {
+          if (target_user_name == '전체') { /* send to all */
             let human_users = users.filter(x => !x.is_bot && !(x.id === 'USLACKBOT'));
             let target_users_id = human_users.map(x => x.id);
             for (i in target_users_id) {
@@ -74,7 +74,7 @@ app.post('/', function(req, res) {
               sendReply(target_msg, target_channel.id);
             }
             sendReply("전체 메시지 전송 완료!", ADMIN_CHANNEL);
-          } else {
+          } else { /* send to individual */
             let target_user = users.find(function(element) {
               return (element.profile.display_name === target_user_name)
                 || (element.profile.real_name === target_user_name)

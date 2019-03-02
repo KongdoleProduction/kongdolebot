@@ -52,20 +52,30 @@ app.post('/', function(req, res) {
         let user_id = payload.event.user;
         if (!user_id) { 
           /* this message is from a bot */
+
           return;
         } else if (channel === ADMIN_CHANNEL) {
           /* this message is from administrator */
-          let re = /\s*\[\[([\s\S]+)\]\]\s*([\s\S]+)/;
 
-          let arr = re.exec(text);
-          if (!arr) {
-            let msg = "사용법: [[사용자 이름]] 메시지";
+          //let re_send_msg = /\s*\[\[([\s\S]+)\]\]\s*([\s\S]+)/; /* format for sending message */
+          let re_cmd = /\s*\[([\s\S]+)\]([\s\S]+)/; /* format for common cmd */
+
+          let arr_cmd = re_cmd.exec(text);
+          if (!arr_cmd) {
+            let msg = "사용법: \n" +
+              "[전체] 메시지\n" +
+              "[예약] 09:00 메시지";
             sendReply(msg, ADMIN_CHANNEL);
             return;
           }
-          let target_user_name = arr[1];
-          let target_msg = arr[2];
-          if (target_user_name == '전체') { /* send to all */
+          let cmd_name = arr_cmd[1];
+          let cmd_contents = arr_cmd[2];
+
+          if (cmd_name === '전체') {
+            let re_msg = /\s*([\s\S]+)/; /* format for message */
+            let arr_msg = re_msg.exec(cmd_contents);
+            let target_msg = arr_msg[1];
+
             let human_users = users.filter(x => !x.is_bot && !(x.id === 'USLACKBOT'));
             let target_users_id = human_users.map(x => x.id);
             for (i in target_users_id) {
@@ -74,30 +84,35 @@ app.post('/', function(req, res) {
               sendReply(target_msg, target_channel.id);
             }
             sendReply("전체 메시지 전송 완료!", ADMIN_CHANNEL);
-          } else { /* send to individual */
-            let target_user = users.find(function(element) {
-              return (element.profile.display_name === target_user_name)
-                || (element.profile.real_name === target_user_name)
-                || (element.name === target_user_name)
-                || (element.real_name === target_user_name);
-            });
-            if (!target_user) {
-              let msg = "존재하지 않는 사용자입니다.\n사용법: [[사용자 이름]] 메시지";
-              sendReply(msg, ADMIN_CHANNEL);
-            } else if (!target_msg || target_msg.length == 0) {
-              let msg = "보낼 메시지를 입력해주세요.\n사용법: [[사용자 이름]] 보낼 메시지";
-              sendReply(msg, ADMIN_CHANNEL);
-            } else {
-              let target_channel = dm_channels.find(function(element) {
-                return element.user === target_user.id;
-              });
+          } else if (cmd_name == '예약') {
 
-              sendReply(target_msg, target_channel.id);
-              sendReply(target_user_name + "님에게 메시지 전송 완료!", ADMIN_CHANNEL);
-            }
           }
+          
+         // } else { /* send to individual */
+         //   let target_user = users.find(function(element) {
+         //     return (element.profile.display_name === target_user_name)
+         //       || (element.profile.real_name === target_user_name)
+         //       || (element.name === target_user_name)
+         //       || (element.real_name === target_user_name);
+         //   });
+         //   if (!target_user) {
+         //     let msg = "존재하지 않는 사용자입니다.\n사용법: [[사용자 이름]] 메시지";
+         //     sendReply(msg, ADMIN_CHANNEL);
+         //   } else if (!target_msg || target_msg.length == 0) {
+         //     let msg = "보낼 메시지를 입력해주세요.\n사용법: [[사용자 이름]] 보낼 메시지";
+         //     sendReply(msg, ADMIN_CHANNEL);
+         //   } else {
+         //     let target_channel = dm_channels.find(function(element) {
+         //       return element.user === target_user.id;
+         //     });
+
+         //     sendReply(target_msg, target_channel.id);
+         //     sendReply(target_user_name + "님에게 메시지 전송 완료!", ADMIN_CHANNEL);
+         //   }
+         // }
         } else {
           /* this message is from a normal user */
+
           user = users.find(function(element) {
             return element.id === user_id; });
           let username = user.profile.display_name;

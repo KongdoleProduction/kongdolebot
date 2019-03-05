@@ -165,7 +165,7 @@ var sendReply = function(message, channel) {
         console.log("reply sent: ", body);
       }
   ); 
-}
+};
 
 var getUsers = function() {
   request.post(
@@ -187,7 +187,7 @@ var getUsers = function() {
         users = body.members;
       }
   );
-}
+};
 
 var getDMChannels = function () {
   request.get(
@@ -208,14 +208,14 @@ var getDMChannels = function () {
         dm_channels = body.channels;
       }
   );
-}
+};
 
 var sendAll = function(target_msg) {
   let human_users = users.filter(x => !x.is_bot && !(x.id === 'USLACKBOT'));
   let target_users_id = human_users.map(x => x.id);
-  for (i in target_users_id) {
+  for (var i in target_users_id) {
     let tuid = target_users_id[i];
     let target_channel = dm_channels.find(x => x.user === tuid);
     sendReply(target_msg, target_channel.id);
   }
-}
+};

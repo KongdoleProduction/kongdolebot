@@ -18,6 +18,7 @@ var server = app.listen(PORT, function() {
 
   users = getUsers();
   dm_channels = getDMChannels();
+  sendReply("콩돌봇 부팅 완료", ADMIN_CHANNEL);
 });
 
 app.post('/', function(req, res) {
@@ -118,7 +119,7 @@ app.post('/', function(req, res) {
             });
 
             sendReply(target_msg, target_channel.id);
-            sendReply(target_user_name + "님에게 메시지 전송 완료!", ADMIN_CHANNEL);
+            sendReply("dm 전송 완료! [@" + target_user_id + "]", ADMIN_CHANNEL);
           }
         } else {
           /* this message is from a normal user */
